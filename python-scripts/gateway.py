@@ -5,9 +5,8 @@ import time
 
 BUFSIZE = 1024
 
-class Gateway:
-    
-    def __init__(self, contiki_ipv6_ip="fd00::1",  contiki_ipv6_port = 5678, server_ip= None, server_port = None):
+class Gateway: 
+    def __init__(self, contiki_ipv6_ip="fd00::1",  contiki_ipv6_port = 5678, server_ip= None, server_port = 8080):
         super().__init__()
         self._port = contiki_ipv6_port # gateway port 
         self._contiki_ipv6_ip = contiki_ipv6_ip # gateway ip
@@ -15,8 +14,13 @@ class Gateway:
         self._server_ip = server_ip # ip of cloud or edge server
         self._server_port = server_port # port of cloud or edge server
 
-    
-    def startGateway(self):
+    def listen(self):
+        if self._server_ip is None:
+            self.__startGateway()
+        else:
+            self.__startGatewayWithEdegeServer()
+
+    def _startGateway(self):
         with socket(AF_INET6, SOCK_DGRAM) as s: # ipv6 udp socket 
             s.bind((self._contiki_ipv6_ip, self._port))
             print("UDP Gateway-server ready: {p}".format(p=self._port))
@@ -28,16 +32,15 @@ class Gateway:
                 count += 1
                 # if count == 1:
                      
-                print(">Gateway: # of Pakcets Received: {p}, Time in Seconds: {t}".format(p= count, t = '{0:.2f}'.format(time.time()-t1) ))
+                print(">Gateway: # of Pakcets Received: {p}, Time in Seconds: {t}".format(p= count, t = '{0:.2f}'.format(time.time()-t1)))
 
-                # s.sendto(data, addr) # send packet to the mote
 
-    def startGatewayWithEdegeServer(self):
+    def _startGatewayWithEdegeServer(self):
         with socket(AF_INET6, SOCK_DGRAM) as s:
             s.bind((self._contiki_ipv6_ip, self._port))
             print(">UDP Gateway-server ready: {p}".format(p=self._port))
         
-        # connecting gateway to the server 
+        """ Connecting gateway to the server """ 
         with socket(AF_INET, SOCK_STREAM) as client_sock:
             client_sock.connect((self._server_ip, self._server_port))
             count = 0
@@ -64,8 +67,9 @@ class Gateway:
 #     sys.exit(2)
 
 if __name__ == "__main__":
-
-    g = Gateway(contiki_ipv6_ip="fd00::1",  contiki_ipv6_port = 5678)
-    g.startGateway()
-
-    
+    if len(sys.argv) <= 1:
+        g = Gateway(contiki_ipv6_ip="fd00::1",  contiki_ipv6_port = 5678)
+        g.listen()
+    else:
+        g = Gateway(contiki_ipv6_ip="fd00::1",  contiki_ipv6_port = 5678, server_ip=sys.argv[1])
+        g.listen()

@@ -12,7 +12,7 @@ class Server:
             raise Exception("Please enter correct ip and port of the server.")
     
     # initiate a TCP connection
-    def serverTCP(self):
+    def listen(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             count = 0
             t1 = time.time()
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     ip = ""
 
     s = Server(ip = ip, port = port)
-    s.serverTCP()
+    s.listen()
 
     
 
