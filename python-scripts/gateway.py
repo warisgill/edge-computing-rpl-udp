@@ -35,11 +35,11 @@ class Gateway:
     def startGatewayWithEdegeServer(self):
         with socket(AF_INET6, SOCK_DGRAM) as s:
             s.bind((self._contiki_ipv6_ip, self._port))
-            print("UDP Gateway-server ready: {p}".format(p=self._port))
+            print(">UDP Gateway-server ready: {p}".format(p=self._port))
         
         # connecting gateway to the server 
         with socket(AF_INET, SOCK_STREAM) as client_sock:
-            client_sock.connect(("172.17.0.1", 8080))
+            client_sock.connect((self._server_ip, self._server_port))
             count = 0
             t1 = time.time()
             while 1:
@@ -68,15 +68,4 @@ if __name__ == "__main__":
     g = Gateway(contiki_ipv6_ip="fd00::1",  contiki_ipv6_port = 5678)
     g.startGateway()
 
-    # gateway1()
-    # PORT = 5678
-    # serverTCP(host, port)
-
-    # if len(sys.argv) < 2:
-    #     usage()
-    # if sys.argv[1] == '-s':
-    #     gatewayServer('fd00::1', port)
-    # elif sys.argv[1] == '-c':
-    #     clientTCP(sys.argv[2], port)
-    # else:
-    #     usage()
+    
